@@ -1,0 +1,89 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Nov 11 14:04:39 2019
+
+@author: TshipaM
+"""
+
+#http://darribas.org/gds15/content/labs/lab_03.html
+
+import os
+import pandas as pd
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+os.chdir('C:\MyPricing\Tx Pricing\GIZ Eskom collaboration\Mar 2020\DC LOSS FACTORS\Shapefile')
+
+south_africa = gpd.read_file('SOU-level_1.shp')
+powerstation = gpd.read_file('POWERSTATION.shp')
+transmission  = gpd.read_file('MTS_LINE_VIEW.shp')
+substations = gpd.read_file('SUBSTATION.shp')
+
+
+sublist = sorted(substations['ID'].to_list())
+
+ipplist = ['ARIES', 'AURORA', 'BACCHUS', 'BOUNDARY',
+           'DELPHI', 'FERRUM', 'GARONA', 'GRASSRIDGE', 'HARVARD', 'HELIOS', 'HYDRA',
+           'JUNO', 'KRONOS', 'MULDERSVLEI', 'OLIEN', 'PAULPUTS', 'POSEIDON',
+           'RUIGTEVALLEI', 'TABOR', 'WITKOP']
+
+
+substations = substations[substations['ID'].isin(ipplist)]
+
+#Join powerstation and substations dataframes
+all_powerstations = pd.concat([powerstation, substations])
+
+
+cost = pd.read_csv('LossFactors2.csv', header=[0], encoding = "ISO-8859-1")
+powerstation_new = pd.merge(all_powerstations, cost, on='ID')
+
+powerstation_new['positive'] = powerstation_new['Loss_Factor'] > 0
+powerstation_new = powerstation_new[powerstation_new['Loss_Factor'] != 0]
+powerstation_new_2 = powerstation_new.copy()
+
+f, ax = plt.subplots(1, figsize=(36, 36))
+south_africa.geometry.boundary.plot(color=None,edgecolor='k',linewidth = 2,ax=ax)
+
+#Use your second dataframe
+powerstation_new.plot(axes=ax, column='Loss_Factor',
+                      color=powerstation_new['positive'].map({True: 'g', False: 'r'}),
+                      markersize=500)
+
+#cmap='RdYlGn'
+#color=powerstation_new['positive'].map({True: 'g', False: 'r'}
+
+powerstation_new_2.plot(axes=ax, label='ID')
+
+
+transmission.plot(axes=ax)
+
+f.suptitle('South Africa')
+ax.set_axis_off()
+plt.show()
+
+#%%
+
+
+import pandas as pd 
+import folium
+from folium.plugins import HeatMap
+
+for_map = powerstation_new_2.fillna(0)
+
+max_amount = float(for_map['Loss_Factor'].max())
+
+hmap = folium.Map(location=[42.5, -75.5], zoom_start=7, )
+
+hm_wide = HeatMap( list(zip(for_map['POINT_X'].values, for_map['POINT_Y'].values,
+                            for_map['Loss_Factor'].values)),
+                   min_opacity=0.2,
+                   max_val=max_amount,
+                   radius=17, blur=15, 
+                   max_zoom=1, 
+                 )
+
+folium.GeoJson(district23).add_to(hmap)
+hmap.add_child(hm_wide)
+
+import sqlite3 as sl
+con = sl.connect('my-test.db')

@@ -1,0 +1,58 @@
+var lastScrollTop = 0;
+window.addEventListener('scroll', function () {
+  var st = window.pageYOffset || document.documentElement.scrollTop;
+  if (st > lastScrollTop) {
+    setTimeout(function () {
+        document.getElementById('header-strip').style.top = '-100%';
+      }, 50);
+  }	else {
+    setTimeout(function () {
+      document.getElementById('header-strip').style.top = '0%';
+    }, 0);
+  }
+
+  lastScrollTop = st;
+}, false);
+
+document.getElementById('slide-menu').addEventListener('mouseleave', function () {
+  setTimeout(function () {
+    closeSlideMenu();
+  }, 500);
+});
+
+document.getElementById('btn-search').addEventListener('click', openSearchStrip);
+document.getElementById('slide-open-button').addEventListener('click', openSlideMenu);
+document.getElementById('slide-close-button').addEventListener('click', closeSlideMenu);
+document.getElementById('main').addEventListener('click', closeSlideMenu);
+document.getElementById('slide-menu').addEventListener('onmouseover', openSlideMenu);
+
+function openSlideMenu() {
+  document.getElementById('slide-menu').style.left = '0px';
+}
+
+function closeSlideMenu() {
+  document.getElementById('slide-menu').style.left = '-9999px';
+}
+
+function openSearchStrip() {
+  if (document.getElementById('search-strip').style.maxHeight != '200px') {
+    document.getElementById('search-strip').style.maxHeight = '200px';
+    document.getElementById('search-strip-input').focus();
+    document.getElementById('btn-search-label').classList.add('btn-search-label-active');
+  }else {
+    document.getElementById('search-strip').style.maxHeight = '0px';
+    document.getElementById('btn-search-label').classList.remove('btn-search-label-active');
+  }
+}
+
+function toggletoc(whichOne)
+{
+  if(document.getElementById(whichOne).style.display == 'none')
+  {
+    document.getElementById(whichOne).style.display = 'block';
+  }
+  else if(document.getElementById(whichOne).style.display == 'block')
+  {
+    document.getElementById(whichOne).style.display = 'none';
+  }
+}
