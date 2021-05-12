@@ -62,7 +62,7 @@ radio_card = dbc.Card([
                     {'label':'Single Slider', 'value': 'slider'},
                     {'label':'Range Slider', 'value': 'range_slider'}
                 ], 
-                value = 'range_slider',
+                value = None,
                 inputStyle={"margin-right": "20px"},
                 labelStyle = {'margin-left':'60px', 'margin-right':'40px'}
             )
@@ -106,6 +106,7 @@ slider_card = dbc.Card([
         ]
     )
 ])
+
 
 if slider == "range_slider":
     app.layout = dbc.Container([
